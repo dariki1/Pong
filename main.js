@@ -4,6 +4,8 @@ let paddleOne = new Paddle(10);
 let paddleTwo = new Paddle(780);
 let ball = new Ball();
 let TAU = Math.PI*2;
+let up = false;
+let down = false;
 
 (function init() {
 	let socket = io();	
@@ -23,6 +25,22 @@ let TAU = Math.PI*2;
 
     ctx.fillStyle = "#FFFFFF";
 
+    window.addEventListener("keydown", function(e) {
+        if (e.keyCode == 40) {//Down
+            down = true;
+        } else if (e.keyCode == 38) {//Up
+            up = true;
+        }
+    });
+
+    window.addEventListener("keyup", function(e) {
+        if (e.keyCode == 40) {//Down
+            down = false;
+        } else if (e.keyCode == 38) {//Up
+            up = false;
+        }
+    });
+
     loop();
 })();
 
@@ -37,6 +55,12 @@ function draw() {
 }
 
 function update() {
+    if (up) {
+        paddleOne.move(-1);
+    }
+    if (down) {
+        paddleOne.move(1);
+    }
     ball.tick();
 }
 
@@ -52,7 +76,7 @@ function Ball() {
     this.x = 395;
     this.y = 195;
     this.sX = Math.sign(Math.random()-0.5)*Math.random()*3;
-    this.sY = 0;//Math.sign(Math.random()-0.5)*Math.random()*3;
+    this.sY = Math.sign(Math.random()-0.5)*Math.random()*3;
     this.tick = function() {
         let nX = this.x + this.sX;
         let nY = this.y + this.sY;
