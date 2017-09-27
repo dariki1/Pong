@@ -1,10 +1,11 @@
-class Ball extends GameObject {
+class Ball {
     radius : number;
     sX : number;
     sY : number;
+    x : number;
+    y : number;
 
     public constructor(radius, speedX, speedY) {
-        super();
         this.radius = radius;
         this.sX = speedX;
         this.sY = speedY;
@@ -13,7 +14,7 @@ class Ball extends GameObject {
     }    
 
     public getPixelRad() : number{
-        return this.radius*Main.c.height/100;
+        return this.radius*GUI.c.height/100;
     }
 
     public tick() : void {
@@ -29,10 +30,10 @@ class Ball extends GameObject {
         }
 
         
-        if (nX <= Main.paddleOne.x+2 && Main.paddleOne.y <= nY && Main.paddleOne.y+Main.paddleOne.height >= nY) {//Bounce off paddle one
+        if (nX <= Main.game.paddleOne.x+2 && Main.game.paddleOne.y <= nY && Main.game.paddleOne.y+Main.game.paddleOne.height >= nY) {//Bounce off paddle one
             this.sX = Math.abs(this.sX);
             nX = this.x + this.sX;
-        } else if (nX >= Main.paddleTwo.x && Main.paddleTwo.y <= nY && Main.paddleTwo.y+Main.paddleTwo.height >= nY) {//Bounce off paddle two
+        } else if (nX >= Main.game.paddleTwo.x && Main.game.paddleTwo.y <= nY && Main.game.paddleTwo.y+Main.game.paddleTwo.height >= nY) {//Bounce off paddle two
             this.sX = Math.abs(this.sX)*-1;
             nX = this.x + this.sX;
         }

@@ -3,6 +3,8 @@ let app = express();
 let server = require('http').Server(app);
 let io = require('socket.io')(server);
 let port = 80;
+let pOne;
+let pTwo;
 
 //Start server on port
 server.listen(port, function() {
@@ -11,30 +13,63 @@ server.listen(port, function() {
 
 //Landing page
 app.get('/', function(req, res){
-	res.sendFile(__dirname + '/index.html');
+	res.sendFile(__dirname + '/Client/index.html');
 });
 
 //When there is a new connection
 io.on('connection', function(socket){
+	if (pOne == undefined) {
+		pOne = socket;
+	} else if (pTwo == undefined) {
+		pTwo = socket;
+	}
 	function send(event, message) {
 		socket.emit(event, message);
 	}
 	
 	output("Connection from " + socket.id);
-	send('mPing','TEST');
-	
-	socket.on('mPong', function(msg) {
-		output("Connection confirmed from " + socket.id);
+
+	socket.on('gameUpdate', function(msg) {
+		output("Update from; " + socket.id + ", message; " + msg);
+		if (msg[0] == 'newGame') {
+			broadcast('gameUpdate',['newGame']);
+			if (pOne != undefined && pTwo != undefined) {
+				broadcast('start', [2, Math.random()*2-1, Math.random()*2-1]);
+			}
+		} else if (msg[0] == 'moveUpdate') {
+			if (socket.id == pOne.id) {
+				pTwo.emit('gameUpdate', ['moveUpdate', msg[1]]);
+			} else if (socket.id == pTwo.id) {
+				pOne.emit('gameUpdate', ['moveUpdate', msg[1]]);
+			}
+		} else if (msg[0] == 'gameLost') {
+			if (socket.id == pOne.id) {
+				broadcast('gameUpdate', ['gameLost', pTwo.id]);
+			} else if (socket.id == pTwo.id) {
+				broadcast('gameUpdate', ['gameLost', pOne.id]);
+			}
+		} else if (msg[0] == 'start') {
+			broadcast('gameUpdate', ['start']);
+		} else if (msg[0] == 'stop') {
+			broadcast('gameUpdate', ['stop']);
+		}
 	});
 	
 	socket.on('disconnect', function() {
-		output("User disconnected");
-		broadcast('User disconnection');
+		output("Disconnection");
+		if (pOne != undefined && pOne.id == socket.id) {
+			pOne = undefined;
+			broadcast('stop');
+		} else if (pTwo != undefined && pTwo.id == socket.id) {
+			pTwo = undefined;
+			broadcast('stop');
+		}
 	});
 });
 
-function broadcast(message) {
-	io.emit('b', message);
+function broadcast(type, message) {
+	output("Broadcasting " + message + " as type " + type);
+	io.emit(type, message);
 }
 
 function addJS(path) {
@@ -48,4 +83,4 @@ function output(msg) {
 	console.log("[" + time + "]: " + msg);
 }
 
-addJS('/');
+addJS('/Client/');

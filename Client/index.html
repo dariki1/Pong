@@ -12,13 +12,21 @@
 			//Javascript is like English; it has no business being as effective, useful or wide-spread as it is.
 		</script>
 		<script>
-				let socket = io.connect('127.0.0.10');
-	
-				socket.on('mPing', function(data) {
-					console.log("Pinged!");
-					socket.emit('mPong');
+			let socket = io();
+			
+			function jsSend(type, message) {
+				console.log("Sending T; " + type + ", M; " + message);
+				socket.emit(type, message);
+			}
+			
+			function jsAddMessageListener(type, callback) {
+				socket.on(type, function(msg){
+					console.log("MESSAGE! T; " + type + ", m; " + msg);
+					callback(msg);
 				});
-				Main.init();
-			</script>
+			}
+
+			Main.init();
+		</script>
 	</body>
 </html>

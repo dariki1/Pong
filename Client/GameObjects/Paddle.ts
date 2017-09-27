@@ -1,18 +1,20 @@
-class Paddle extends GameObject {
+class Paddle {
     x : number;
     y : number = 35;
     height : number = 30;
+    up : boolean = false;
+    down : boolean = false;
+    speed : number = .75;
 
     constructor(newXPos) {
-        super();
         this.x = newXPos;
     }
 
     public getPixelHeight() : number {
-        return this.height*Main.c.height/100;
+        return this.height*GUI.c.height/100;
     }
 
-    public move(num) : void {
+    private move(num) : void {
         let nY = this.y+num;
 
         if (nY < 0) {
@@ -22,5 +24,14 @@ class Paddle extends GameObject {
         }
 
         this.y = nY;
+    }
+
+    public tick() : void {
+        if (this.up) {
+            this.move(this.speed*-1);
+        }
+        if (this.down) {
+            this.move(this.speed);
+        }
     }
 }
