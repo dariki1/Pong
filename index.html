@@ -7,9 +7,18 @@
 	
 	<body>
 		<canvas id='c' width = 800 height = 400></canvas>
-		<script src="/socket.io/socket.io.js"></script>
-		<script src = "main.js">
+		<script src = "/socket.io/socket.io.js"></script>
+		<script src = "script.js">
 			//Javascript is like English; it has no business being as effective, useful or wide-spread as it is.
 		</script>
+		<script>
+				let socket = io.connect('127.0.0.10');
+	
+				socket.on('mPing', function(data) {
+					console.log("Pinged!");
+					socket.emit('mPong');
+				});
+				Main.init();
+			</script>
 	</body>
 </html>
